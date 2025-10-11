@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Tp_AppVet.Models
 {
@@ -12,6 +13,7 @@ namespace Tp_AppVet.Models
         public required string Email { get; set; }
         
         [Required(ErrorMessage = "El telefono no puede estar vacío")]
+        [Column("Teléfono")]
         public required string Telefono { get; set; }
         
 
