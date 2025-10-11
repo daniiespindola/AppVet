@@ -1,5 +1,8 @@
-using System.Diagnostics;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 using Tp_AppVet.Models;
 
 namespace Tp_AppVet.Controllers
@@ -18,6 +21,24 @@ namespace Tp_AppVet.Controllers
             return View();
         }
 
+        public IActionResult Login()
+        {
+            var properties = new Microsoft.AspNetCore.Authentication.AuthenticationProperties
+            {
+                
+                RedirectUri = Url.Action("Create", "Clientes")
+            };
+            return Challenge(properties, "Google");
+        }
+        [Authorize] 
+
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            // Redirige al usuario a la página de inicio 
+            return RedirectToAction("Index", "Home");
+        }
         public IActionResult Privacy()
         {
             return View();
