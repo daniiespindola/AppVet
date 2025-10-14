@@ -5,6 +5,7 @@ namespace Tp_AppVet.Models
 {
     public class Cliente
     {
+        [Key]
         public int Id { get; set; }
         [Required(ErrorMessage = "El nombre no puede estar vacío")]
         public  string Nombre { get; set; }
@@ -18,6 +19,6 @@ namespace Tp_AppVet.Models
         public int UsuarioId { get; set; }
         public Usuario Usuario { get; set; }
         public ICollection<Mascota> Mascotas { get; set; }
-
+        public ICollection<Turno> Turnos { get; set; }
     }
 }

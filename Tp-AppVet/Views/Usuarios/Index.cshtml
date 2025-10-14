@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Tp_AppVet.Models.Cliente>
+﻿@model IEnumerable<Tp_AppVet.Models.Usuario>
 
 @{
     ViewData["Title"] = "Index";
@@ -13,13 +13,13 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Nombre)
-            </th>
-            <th>
                 @Html.DisplayNameFor(model => model.Email)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Telefono)
+                @Html.DisplayNameFor(model => model.PasswordHash)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Rol)
             </th>
             <th></th>
         </tr>
@@ -28,13 +28,13 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Nombre)
-            </td>
-            <td>
                 @Html.DisplayFor(modelItem => item.Email)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Telefono)
+                @Html.DisplayFor(modelItem => item.PasswordHash)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Rol)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |

@@ -4,6 +4,7 @@ namespace Tp_AppVet.Models
 {
     public class Veterinario
     {
+        [Key]
         public int Id { get; set; }
         [Required(ErrorMessage="Ingrese su nombre")]
         public string Nombre { get; set; }
