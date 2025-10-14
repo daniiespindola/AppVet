@@ -10,23 +10,23 @@ using Tp_AppVet.Models;
 
 namespace Tp_AppVet.Controllers
 {
-    public class ClientesController : Controller
+    public class MascotasController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public ClientesController(ApplicationDbContext context)
+        public MascotasController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: Clientes
+        // GET: Mascotas
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Clientes.Include(c => c.Usuario);
+            var applicationDbContext = _context.Mascotas.Include(m => m.Cliente);
             return View(await applicationDbContext.ToListAsync());
         }
 
-        // GET: Clientes/Details/5
+        // GET: Mascotas/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -34,42 +34,42 @@ namespace Tp_AppVet.Controllers
                 return NotFound();
             }
 
-            var cliente = await _context.Clientes
-                .Include(c => c.Usuario)
+            var mascota = await _context.Mascotas
+                .Include(m => m.Cliente)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (cliente == null)
+            if (mascota == null)
             {
                 return NotFound();
             }
 
-            return View(cliente);
+            return View(mascota);
         }
 
-        // GET: Clientes/Create
+        // GET: Mascotas/Create
         public IActionResult Create()
         {
-            ViewData["UsuarioId"] = new SelectList(_context.Usuarios, "Id", "Email");
+            ViewData["ClienteId"] = new SelectList(_context.Clientes, "Id", "Apellido");
             return View();
         }
 
-        // POST: Clientes/Create
+        // POST: Mascotas/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nombre,Apellido,Dni,Telefono,UsuarioId")] Cliente cliente)
+        public async Task<IActionResult> Create([Bind("Id,Nombre,Especie,Raza,Edad,ClienteId")] Mascota mascota)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(cliente);
+                _context.Add(mascota);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["UsuarioId"] = new SelectList(_context.Usuarios, "Id", "Email", cliente.UsuarioId);
-            return View(cliente);
+            ViewData["ClienteId"] = new SelectList(_context.Clientes, "Id", "Apellido", mascota.ClienteId);
+            return View(mascota);
         }
 
-        // GET: Clientes/Edit/5
+        // GET: Mascotas/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -77,23 +77,23 @@ namespace Tp_AppVet.Controllers
                 return NotFound();
             }
 
-            var cliente = await _context.Clientes.FindAsync(id);
-            if (cliente == null)
+            var mascota = await _context.Mascotas.FindAsync(id);
+            if (mascota == null)
             {
                 return NotFound();
             }
-            ViewData["UsuarioId"] = new SelectList(_context.Usuarios, "Id", "Email", cliente.UsuarioId);
-            return View(cliente);
+            ViewData["ClienteId"] = new SelectList(_context.Clientes, "Id", "Apellido", mascota.ClienteId);
+            return View(mascota);
         }
 
-        // POST: Clientes/Edit/5
+        // POST: Mascotas/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nombre,Apellido,Dni,Telefono,UsuarioId")] Cliente cliente)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Nombre,Especie,Raza,Edad,ClienteId")] Mascota mascota)
         {
-            if (id != cliente.Id)
+            if (id != mascota.Id)
             {
                 return NotFound();
             }
@@ -102,12 +102,12 @@ namespace Tp_AppVet.Controllers
             {
                 try
                 {
-                    _context.Update(cliente);
+                    _context.Update(mascota);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ClienteExists(cliente.Id))
+                    if (!MascotaExists(mascota.Id))
                     {
                         return NotFound();
                     }
@@ -118,11 +118,11 @@ namespace Tp_AppVet.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["UsuarioId"] = new SelectList(_context.Usuarios, "Id", "Email", cliente.UsuarioId);
-            return View(cliente);
+            ViewData["ClienteId"] = new SelectList(_context.Clientes, "Id", "Apellido", mascota.ClienteId);
+            return View(mascota);
         }
 
-        // GET: Clientes/Delete/5
+        // GET: Mascotas/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -130,35 +130,35 @@ namespace Tp_AppVet.Controllers
                 return NotFound();
             }
 
-            var cliente = await _context.Clientes
-                .Include(c => c.Usuario)
+            var mascota = await _context.Mascotas
+                .Include(m => m.Cliente)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (cliente == null)
+            if (mascota == null)
             {
                 return NotFound();
             }
 
-            return View(cliente);
+            return View(mascota);
         }
 
-        // POST: Clientes/Delete/5
+        // POST: Mascotas/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var cliente = await _context.Clientes.FindAsync(id);
-            if (cliente != null)
+            var mascota = await _context.Mascotas.FindAsync(id);
+            if (mascota != null)
             {
-                _context.Clientes.Remove(cliente);
+                _context.Mascotas.Remove(mascota);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool ClienteExists(int id)
+        private bool MascotaExists(int id)
         {
-            return _context.Clientes.Any(e => e.Id == id);
+            return _context.Mascotas.Any(e => e.Id == id);
         }
     }
 }

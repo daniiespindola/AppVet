@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Tp_AppVet.Models.Cliente>
+﻿@model IEnumerable<Tp_AppVet.Models.Turno>
 
 @{
     ViewData["Title"] = "Index";
@@ -13,19 +13,19 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Nombre)
+                @Html.DisplayNameFor(model => model.Fecha)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Apellido)
+                @Html.DisplayNameFor(model => model.Motivo)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Dni)
+                @Html.DisplayNameFor(model => model.Cliente)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Telefono)
+                @Html.DisplayNameFor(model => model.Mascota)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Usuario)
+                @Html.DisplayNameFor(model => model.Veterinario)
             </th>
             <th></th>
         </tr>
@@ -34,19 +34,19 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Nombre)
+                @Html.DisplayFor(modelItem => item.Fecha)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Apellido)
+                @Html.DisplayFor(modelItem => item.Motivo)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Dni)
+                @Html.DisplayFor(modelItem => item.Cliente.Apellido)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Telefono)
+                @Html.DisplayFor(modelItem => item.Mascota.Especie)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Usuario.Email)
+                @Html.DisplayFor(modelItem => item.Veterinario.Apellido)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |

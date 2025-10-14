@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Tp_AppVet.Models.Cliente>
+﻿@model IEnumerable<Tp_AppVet.Models.Mascota>
 
 @{
     ViewData["Title"] = "Index";
@@ -16,16 +16,16 @@
                 @Html.DisplayNameFor(model => model.Nombre)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Apellido)
+                @Html.DisplayNameFor(model => model.Especie)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Dni)
+                @Html.DisplayNameFor(model => model.Raza)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Telefono)
+                @Html.DisplayNameFor(model => model.Edad)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Usuario)
+                @Html.DisplayNameFor(model => model.Cliente)
             </th>
             <th></th>
         </tr>
@@ -37,16 +37,16 @@
                 @Html.DisplayFor(modelItem => item.Nombre)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Apellido)
+                @Html.DisplayFor(modelItem => item.Especie)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Dni)
+                @Html.DisplayFor(modelItem => item.Raza)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Telefono)
+                @Html.DisplayFor(modelItem => item.Edad)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Usuario.Email)
+                @Html.DisplayFor(modelItem => item.Cliente.Apellido)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |

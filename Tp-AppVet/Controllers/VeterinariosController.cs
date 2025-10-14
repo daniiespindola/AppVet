@@ -10,23 +10,23 @@ using Tp_AppVet.Models;
 
 namespace Tp_AppVet.Controllers
 {
-    public class ClientesController : Controller
+    public class VeterinariosController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public ClientesController(ApplicationDbContext context)
+        public VeterinariosController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: Clientes
+        // GET: Veterinarios
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Clientes.Include(c => c.Usuario);
+            var applicationDbContext = _context.Veterinarios.Include(v => v.Usuario);
             return View(await applicationDbContext.ToListAsync());
         }
 
-        // GET: Clientes/Details/5
+        // GET: Veterinarios/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -34,42 +34,42 @@ namespace Tp_AppVet.Controllers
                 return NotFound();
             }
 
-            var cliente = await _context.Clientes
-                .Include(c => c.Usuario)
+            var veterinario = await _context.Veterinarios
+                .Include(v => v.Usuario)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (cliente == null)
+            if (veterinario == null)
             {
                 return NotFound();
             }
 
-            return View(cliente);
+            return View(veterinario);
         }
 
-        // GET: Clientes/Create
+        // GET: Veterinarios/Create
         public IActionResult Create()
         {
             ViewData["UsuarioId"] = new SelectList(_context.Usuarios, "Id", "Email");
             return View();
         }
 
-        // POST: Clientes/Create
+        // POST: Veterinarios/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nombre,Apellido,Dni,Telefono,UsuarioId")] Cliente cliente)
+        public async Task<IActionResult> Create([Bind("Id,Nombre,Apellido,Matricula,Especialidad,UsuarioId")] Veterinario veterinario)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(cliente);
+                _context.Add(veterinario);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["UsuarioId"] = new SelectList(_context.Usuarios, "Id", "Email", cliente.UsuarioId);
-            return View(cliente);
+            ViewData["UsuarioId"] = new SelectList(_context.Usuarios, "Id", "Email", veterinario.UsuarioId);
+            return View(veterinario);
         }
 
-        // GET: Clientes/Edit/5
+        // GET: Veterinarios/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -77,23 +77,23 @@ namespace Tp_AppVet.Controllers
                 return NotFound();
             }
 
-            var cliente = await _context.Clientes.FindAsync(id);
-            if (cliente == null)
+            var veterinario = await _context.Veterinarios.FindAsync(id);
+            if (veterinario == null)
             {
                 return NotFound();
             }
-            ViewData["UsuarioId"] = new SelectList(_context.Usuarios, "Id", "Email", cliente.UsuarioId);
-            return View(cliente);
+            ViewData["UsuarioId"] = new SelectList(_context.Usuarios, "Id", "Email", veterinario.UsuarioId);
+            return View(veterinario);
         }
 
-        // POST: Clientes/Edit/5
+        // POST: Veterinarios/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nombre,Apellido,Dni,Telefono,UsuarioId")] Cliente cliente)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Nombre,Apellido,Matricula,Especialidad,UsuarioId")] Veterinario veterinario)
         {
-            if (id != cliente.Id)
+            if (id != veterinario.Id)
             {
                 return NotFound();
             }
@@ -102,12 +102,12 @@ namespace Tp_AppVet.Controllers
             {
                 try
                 {
-                    _context.Update(cliente);
+                    _context.Update(veterinario);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ClienteExists(cliente.Id))
+                    if (!VeterinarioExists(veterinario.Id))
                     {
                         return NotFound();
                     }
@@ -118,11 +118,11 @@ namespace Tp_AppVet.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["UsuarioId"] = new SelectList(_context.Usuarios, "Id", "Email", cliente.UsuarioId);
-            return View(cliente);
+            ViewData["UsuarioId"] = new SelectList(_context.Usuarios, "Id", "Email", veterinario.UsuarioId);
+            return View(veterinario);
         }
 
-        // GET: Clientes/Delete/5
+        // GET: Veterinarios/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -130,35 +130,35 @@ namespace Tp_AppVet.Controllers
                 return NotFound();
             }
 
-            var cliente = await _context.Clientes
-                .Include(c => c.Usuario)
+            var veterinario = await _context.Veterinarios
+                .Include(v => v.Usuario)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (cliente == null)
+            if (veterinario == null)
             {
                 return NotFound();
             }
 
-            return View(cliente);
+            return View(veterinario);
         }
 
-        // POST: Clientes/Delete/5
+        // POST: Veterinarios/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var cliente = await _context.Clientes.FindAsync(id);
-            if (cliente != null)
+            var veterinario = await _context.Veterinarios.FindAsync(id);
+            if (veterinario != null)
             {
-                _context.Clientes.Remove(cliente);
+                _context.Veterinarios.Remove(veterinario);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool ClienteExists(int id)
+        private bool VeterinarioExists(int id)
         {
-            return _context.Clientes.Any(e => e.Id == id);
+            return _context.Veterinarios.Any(e => e.Id == id);
         }
     }
 }

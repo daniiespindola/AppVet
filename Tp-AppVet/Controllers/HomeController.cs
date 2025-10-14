@@ -26,7 +26,7 @@ namespace Tp_AppVet.Controllers
             var properties = new Microsoft.AspNetCore.Authentication.AuthenticationProperties
             {
                 
-                RedirectUri = Url.Action("Create", "Clientes")
+                RedirectUri = Url.Action("Create", "Usuarios")
             };
             return Challenge(properties, "Google");
         }

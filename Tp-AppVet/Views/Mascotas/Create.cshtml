@@ -1,4 +1,4 @@
-﻿@model Tp_AppVet.Models.Cliente
+﻿@model Tp_AppVet.Models.Mascota
 
 @{
     ViewData["Title"] = "Create";
@@ -6,7 +6,7 @@
 
 <h1>Create</h1>
 
-<h4>Cliente</h4>
+<h4>Mascota</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -18,23 +18,23 @@
                 <span asp-validation-for="Nombre" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Apellido" class="control-label"></label>
-                <input asp-for="Apellido" class="form-control" />
-                <span asp-validation-for="Apellido" class="text-danger"></span>
+                <label asp-for="Especie" class="control-label"></label>
+                <input asp-for="Especie" class="form-control" />
+                <span asp-validation-for="Especie" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Dni" class="control-label"></label>
-                <input asp-for="Dni" class="form-control" />
-                <span asp-validation-for="Dni" class="text-danger"></span>
+                <label asp-for="Raza" class="control-label"></label>
+                <input asp-for="Raza" class="form-control" />
+                <span asp-validation-for="Raza" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Telefono" class="control-label"></label>
-                <input asp-for="Telefono" class="form-control" />
-                <span asp-validation-for="Telefono" class="text-danger"></span>
+                <label asp-for="Edad" class="control-label"></label>
+                <input asp-for="Edad" class="form-control" />
+                <span asp-validation-for="Edad" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="UsuarioId" class="control-label"></label>
-                <select asp-for="UsuarioId" class ="form-control" asp-items="ViewBag.UsuarioId"></select>
+                <label asp-for="ClienteId" class="control-label"></label>
+                <select asp-for="ClienteId" class ="form-control" asp-items="ViewBag.ClienteId"></select>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />

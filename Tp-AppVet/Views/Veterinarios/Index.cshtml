@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Tp_AppVet.Models.Cliente>
+﻿@model IEnumerable<Tp_AppVet.Models.Veterinario>
 
 @{
     ViewData["Title"] = "Index";
@@ -19,10 +19,10 @@
                 @Html.DisplayNameFor(model => model.Apellido)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Dni)
+                @Html.DisplayNameFor(model => model.Matricula)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Telefono)
+                @Html.DisplayNameFor(model => model.Especialidad)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Usuario)
@@ -40,10 +40,10 @@
                 @Html.DisplayFor(modelItem => item.Apellido)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Dni)
+                @Html.DisplayFor(modelItem => item.Matricula)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Telefono)
+                @Html.DisplayFor(modelItem => item.Especialidad)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Usuario.Email)
