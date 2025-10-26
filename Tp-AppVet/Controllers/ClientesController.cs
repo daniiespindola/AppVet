@@ -53,8 +53,7 @@ namespace Tp_AppVet.Controllers
         }
 
         // POST: Clientes/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+    
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Nombre,Apellido,Dni,Telefono,UsuarioId")] Cliente cliente)
@@ -63,6 +62,7 @@ namespace Tp_AppVet.Controllers
             {
                 _context.Add(cliente);
                 await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "¡El cliente " + cliente.Nombre + " ha sido creado con éxito!";
                 return RedirectToAction(nameof(Index));
             }
             ViewData["UsuarioId"] = new SelectList(_context.Usuarios, "Id", "Email", cliente.UsuarioId);
@@ -87,8 +87,7 @@ namespace Tp_AppVet.Controllers
         }
 
         // POST: Clientes/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+      
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Nombre,Apellido,Dni,Telefono,UsuarioId")] Cliente cliente)
@@ -146,13 +145,23 @@ namespace Tp_AppVet.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            // 1. PRIMERO: Encontrar el cliente
             var cliente = await _context.Clientes.FindAsync(id);
+
             if (cliente != null)
             {
+                // 2. SEGUNDO: Obtener el nombre ANTES de la eliminación
+                string nombreCliente = cliente.Nombre;
+
+                // 3. TERCERO: Eliminar y guardar cambios
                 _context.Clientes.Remove(cliente);
+                await _context.SaveChangesAsync();
+
+                // 4. CUARTO: Configurar TempData con el nombre correcto
+                TempData["SuccessMessage"] = $"¡El cliente {nombreCliente} ha sido eliminado con éxito!";
             }
 
-            await _context.SaveChangesAsync();
+            // Si el cliente era nulo, simplemente redirige sin mensaje de éxito
             return RedirectToAction(nameof(Index));
         }
 

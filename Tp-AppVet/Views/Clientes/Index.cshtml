@@ -7,7 +7,7 @@
 <h1>Index</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create">Crear nuevo usuario</a>
 </p>
 <table class="table">
     <thead>
@@ -49,11 +49,42 @@
                 @Html.DisplayFor(modelItem => item.Usuario.Email)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+
+                    <form id="deleteForm_@item.Id" asp-action="Borrar" asp-route-id="@item.Id" method="post" style="display:inline;">
+
+                        <button type="button"
+                                onclick="confirmarEliminacion(@item.Id)"
+                                class="btn btn-link p-0 text-danger">
+                            Delete
+                        </button>
+                    </form>
             </td>
         </tr>
 }
     </tbody>
 </table>
+@section Scripts {
+    <script>
+        function confirmarEliminacion(id) {
+            // Dispara la alerta de confirmación
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: "¡No podrás revertir esta acción!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33', // Rojo para eliminar
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Sí, ¡Eliminar!',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                // Comprueba si el usuario hizo clic en "Sí, ¡Eliminar!"
+                if (result.isConfirmed) {
+                    // Envía el formulario POST con el ID correspondiente al Controller
+                    document.getElementById('deleteForm_' + id).submit();
+                }
+            });
+        }
+    </script>
+}

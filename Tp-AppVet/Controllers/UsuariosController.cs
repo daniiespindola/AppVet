@@ -60,6 +60,7 @@ namespace Tp_AppVet.Controllers
             {
                 _context.Add(usuario);
                 await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = $"¡El usuario con Email: {usuario.Email} ha sido creado con éxito!";
                 return RedirectToAction(nameof(Index));
             }
             return View(usuario);
@@ -140,12 +141,14 @@ namespace Tp_AppVet.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var usuario = await _context.Usuarios.FindAsync(id);
+            string emailUsuario = usuario?.Email ?? "desconocido";
             if (usuario != null)
             {
                 _context.Usuarios.Remove(usuario);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = $"¡El usuario con Email: {emailUsuario} ha sido eliminado con éxito!";
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 

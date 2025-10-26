@@ -12,8 +12,8 @@ using Tp_AppVet.Data;
 namespace Tp_AppVet.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251014013802_FixCascadePaths")]
-    partial class FixCascadePaths
+    [Migration("20251025232638_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
