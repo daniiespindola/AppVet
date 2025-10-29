@@ -12,8 +12,8 @@ using Tp_AppVet.Data;
 namespace Tp_AppVet.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251025232638_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20251029135914_Inicial")]
+    partial class Inicial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -162,10 +162,6 @@ namespace Tp_AppVet.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
