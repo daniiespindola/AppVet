@@ -1,5 +1,48 @@
-﻿@{
-    ViewData["Title"] = "Dashboard Admin";
-}
-<h1>Bienvenido al Dashboard de Admin</h1>
-<p>Por ahora esta vista está vacía, solo para probar el login con Google.</p>
+﻿@model IEnumerable<Tp_AppVet.Models.Usuario>
+
+<div class="container mt-4">
+    <h2>Panel de Administración</h2>
+    <hr />
+
+    <div class="mb-3">
+        <a class="btn btn-primary" asp-controller="Clientes" asp-action="Index">Administrar Clientes</a>
+        <a class="btn btn-primary" asp-controller="Veterinarios" asp-action="Index">Administrar Veterinarios</a>
+    </div>
+
+    <h3>Administración de Usuarios</h3>
+    <table id="usuariosTable" class="table table-striped table-bordered datatable">
+        <thead>
+            <tr>
+                <th>Email</th>
+                <th>Rol</th>
+                <th>Acción</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var u in Model)
+            {
+                <tr>
+                    <td>@u.Email</td>
+                    <td>@u.Rol</td>
+                    <td>
+                        <form asp-action="CambiarRol" method="post" class="d-inline">
+                            <input type="hidden" name="id" value="@u.Id" />
+                            @if (u.Rol == "Administrador")
+                            {
+                                <button type="submit" class="btn btn-sm btn-danger">
+                                    Quitar Admin
+                                </button>
+                            }
+                            else
+                            {
+                                <button type="submit" class="btn btn-sm btn-success">
+                                    Asignar Admin
+                                </button>
+                            }
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

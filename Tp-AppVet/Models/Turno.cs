@@ -15,16 +15,16 @@ namespace Tp_AppVet.Models
         // 🔹 Relación con Cliente
         [ForeignKey("Cliente")]
         public int ClienteId { get; set; }
-        public Cliente Cliente { get; set; }
+        public Cliente? Cliente { get; set; }
 
         // 🔹 Relación con Mascota
         [ForeignKey("Mascota")]
         public int MascotaId { get; set; }
-        public Mascota Mascota { get; set; }
+        public Mascota? Mascota { get; set; }
 
         // 🔹 Relación con Veterinario
         [ForeignKey("Veterinario")]
         public int VeterinarioId { get; set; }
-        public Veterinario Veterinario { get; set; }
+        public Veterinario? Veterinario { get; set; }
     }
 }

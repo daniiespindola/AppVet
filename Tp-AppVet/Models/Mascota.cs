@@ -18,7 +18,7 @@ namespace Tp_AppVet.Models
         // 🔹 Relación con Cliente (uno a muchos)
         [ForeignKey("Cliente")]
         public int ClienteId { get; set; }
-        public Cliente Cliente { get; set; }
+        public Cliente? Cliente { get; set; }
 
         // 🔹 Relación 1 a 1 con Ficha Médica
         public FichaMedica? FichaMedica { get; set; }

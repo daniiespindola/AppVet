@@ -17,8 +17,8 @@ namespace Tp_AppVet.Models
         [Required(ErrorMessage = "El telefono no puede estar vacío")]
         public string Telefono { get; set; }
         public int UsuarioId { get; set; }
-        public Usuario Usuario { get; set; }
-        public ICollection<Mascota> Mascotas { get; set; }
-        public ICollection<Turno> Turnos { get; set; }
+        public Usuario? Usuario { get; set; }
+        public ICollection<Mascota>? Mascotas { get; set; }
+        public ICollection<Turno>? Turnos { get; set; }
     }
 }

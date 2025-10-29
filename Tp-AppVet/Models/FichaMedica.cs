@@ -15,6 +15,6 @@ namespace Tp_AppVet.Models
         // 🔹 Relación 1 a 1 con Mascota
         [ForeignKey("Mascota")]
         public int MascotaId { get; set; }
-        public Mascota Mascota { get; set; }
+        public Mascota? Mascota { get; set; }
     }
 }

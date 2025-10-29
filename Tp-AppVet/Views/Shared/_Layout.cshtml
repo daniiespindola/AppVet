@@ -6,12 +6,12 @@
     <title>@ViewData["Title"] - Tp_AppVet</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/Tp_AppVet.styles.css" asp-append-version="true" />
+    
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/2.3.4/css/dataTables.dataTables.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     
-
+    @*<link rel="stylesheet" href="~/Tp_AppVet.styles.css" asp-append-version="true" /> *@
 </head>
 <body>
     <header>
@@ -84,7 +84,7 @@
         $(document).ready(function () {
             $('.datatable').DataTable({
                 language: {
-                    url: '//cdn.datatables.net/plug-ins/2.3.4/i18n/es-ES.json'
+                    url: 'https://cdn.datatables.net/plug-ins/2.3.4/i18n/es-ES.json'
                 },
                 responsive: true,
                 pageLength: 5,
