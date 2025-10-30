@@ -4,7 +4,7 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<h1>Mascotas Index</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
@@ -57,6 +57,12 @@
 }
     </tbody>
 </table>
-<a asp-controller="VeterinarioDashboard" asp-action="Index" class="btn btn-secondary">
-    ← Volver al Dashboard
+<a asp-controller="VeterinarioDashboard" asp-action="Index" class="btn btn-secondary p-2">
+    ← Volver al Dashboard Vet
 </a>
+@if (User.IsInRole("Administrador"))
+{
+    <a asp-controller="Admin" asp-action="Dashboard" class="btn btn-secondary">
+        ← Volver al Dashboard Admin
+    </a>
+}

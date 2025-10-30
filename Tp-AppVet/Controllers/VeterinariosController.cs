@@ -1,17 +1,20 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Tp_AppVet.Data;
 using Tp_AppVet.Models;
 
 namespace Tp_AppVet.Controllers
 {
-    [Authorize(Roles = "Administrador")]
+    [Authorize(Roles = "Administrador,Pendiente")]
     public class VeterinariosController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -66,15 +69,30 @@ namespace Tp_AppVet.Controllers
                 _context.Add(veterinario);
                 await _context.SaveChangesAsync();
 
-                var usuario = await _context.Usuarios.FindAsync(veterinario.UsuarioId);
+                var usuario = await _context.Usuarios
+                    .FirstOrDefaultAsync(u => u.Id == veterinario.UsuarioId);
+                    
                 if(usuario != null)
                 {
                     usuario.Rol = "Veterinario";
                     _context.Update(usuario);
                     await _context.SaveChangesAsync();
+                    
+                    var claims = new List<Claim>
+                    {
+                        new Claim(ClaimTypes.Name, usuario.Email),
+                        new Claim(ClaimTypes.Email, usuario.Email),
+                        new Claim(ClaimTypes.Role, usuario.Rol)
+                    };
+
+                    var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+                    var principal = new ClaimsPrincipal(identity);
+                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
                 }
-                TempData["SuccessMessage"] = "Veterinario creado Exitosamente";
-                return RedirectToAction(nameof(Index));
+
+                TempData["SuccessMessage"] = $"Veterinario creado Exitosamente: {usuario?.Email}";
+                return RedirectToAction("Index", "VeterinarioDashboard");
             }
             ViewData["UsuarioId"] = new SelectList(_context.Usuarios, "Id", "Email", veterinario.UsuarioId);
             return View(veterinario);
@@ -157,14 +175,36 @@ namespace Tp_AppVet.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var veterinario = await _context.Veterinarios.FindAsync(id);
-            if (veterinario != null)
+            var veterinario = await _context.Veterinarios
+                .Include(v => v.Usuario)
+                .Include(v => v.Turnos)
+                .FirstOrDefaultAsync(v => v.Id == id);
+
+
+            if (veterinario == null)
             {
-                _context.Veterinarios.Remove(veterinario);
+                return NotFound();
             }
 
+            if (veterinario.Turnos != null && veterinario.Turnos.Any())
+            {
+                TempData["ErrorMessage"] = "No se puede eliminar el veterinario porque tiene turnos asignados. Elimine los turnos primero.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            //Eliminar veterinario
+            _context.Veterinarios.Remove(veterinario);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+            //Eliminar Usuario asociado
+            if (veterinario.Usuario != null)
+            {
+                _context.Usuarios.Remove(veterinario.Usuario);
+                await _context.SaveChangesAsync();
+            } 
+
+            TempData["SuccessMessage"] = "Veterinario eliminado correctamente";
+            return RedirectToAction("Index", "VeterinarioDashboard");
         }
 
         private bool VeterinarioExists(int id)

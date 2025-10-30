@@ -70,3 +70,11 @@
         <p class="alert alert-info">Todavía no tenés mascotas registradas.</p>
     }
 </div>
+@if (User.IsInRole("Administrador"))
+{
+    <a asp-controller="Admin" asp-action="Dashboard" class="btn btn-secondary">
+        ← Volver al Dashboard Admin
+    </a>
+}
+
+

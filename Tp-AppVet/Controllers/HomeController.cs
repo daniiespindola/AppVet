@@ -65,7 +65,6 @@ namespace Tp_AppVet.Controllers
         [HttpGet]
         public async Task<IActionResult> GoogleLoginCallback()
         {
-            // 1. Finaliza el proceso de autenticación iniciado por Challenge()
             // Esta línea lee la información del usuario de Google
             var authenticateResult = await HttpContext.AuthenticateAsync("Google");
 
@@ -88,10 +87,10 @@ namespace Tp_AppVet.Controllers
             if (usuario == null)
             {
                 // Asignar rol Admin si es tu correo, Cliente para otros
-                string rol = (email == "rebecolque263@gmail.com") ? "Administrador" : "Cliente";
+                string rol = (email == "rebecolque263@gmail.com") ? "Administrador" : "Pendiente";
                 usuario = new Usuario { Email = email, Rol = rol };
                 _context.Usuarios.Add(usuario);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
             }
 
             // Crear claims incluyendo el rol
@@ -108,7 +107,11 @@ namespace Tp_AppVet.Controllers
             await HttpContext.SignInAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 principal);
-
+            //si el rol esta pendiente -> mostrar modal de elección
+            if (usuario.Rol == "Pendiente")
+            {
+                return RedirectToAction("ElegirRegistro");
+            }
             // Redirigir según rol
             return usuario.Rol switch
             {
@@ -117,6 +120,11 @@ namespace Tp_AppVet.Controllers
                 "Cliente" => RedirectToAction("Index", "ClienteDashboard"),
                 _ => RedirectToAction("Index", "Home")
             };
+        }
+        
+        public IActionResult ElegirRegistro()
+        {
+            return View();
         }
     }
 }

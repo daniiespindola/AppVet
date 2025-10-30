@@ -10,4 +10,10 @@
         <a class="btn btn-primary" asp-controller="Turnoes" asp-action="Index">Gestionar Turnos</a>
         <a class="btn btn-primary" asp-controller="FichaMedicas" asp-action="Index">Gestionar Fichas Médicas</a>
     </div>
+    @if (User.IsInRole("Administrador"))
+    {
+        <a asp-controller="Admin" asp-action="Dashboard" class="btn btn-secondary">
+            ← Volver al Dashboard Admin
+        </a>
+    }
 </div>

@@ -24,13 +24,23 @@ namespace Tp_AppVet.Controllers
         [HttpPost]
         public IActionResult CambiarRol(int id) {
             var usuario = _context.Usuarios.Find(id);
+            
             if(usuario != null)
             {
-                usuario.Rol = (usuario.Rol == "Administrador") ? "Cliente" : "Administrador";
+                if (usuario.Rol == "Administrador")
+                {
+                    usuario.Rol = string.IsNullOrEmpty(usuario.RolAnterior) ? "Cliente" : usuario.RolAnterior;
+                    usuario.RolAnterior = null;
+                    TempData["SuccessMessage"] = $"{usuario.Email} ya no es Administrador.";
+                }
+                else
+                {
+                    usuario.RolAnterior = usuario.Rol;
+                    usuario.Rol = "Administrador";
+                    TempData["SuccessMessage"] = $"{usuario.Email} ahora es Administrador.";
+                }
                 _context.SaveChanges();
-                TempData["SuccessMessage"] = usuario.Rol == "Administrador"
-                ? $"{usuario.Email} ahora es Administrador."
-                : $"{usuario.Email} ya no es Administrador.";
+
             }
             return RedirectToAction("Dashboard");
         }

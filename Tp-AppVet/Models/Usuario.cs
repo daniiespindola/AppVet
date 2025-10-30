@@ -10,6 +10,7 @@ namespace Tp_AppVet.Models
         [EmailAddress]
         public string Email { get; set; }
         [Required(ErrorMessage = "Elija un rol")]
-        public string Rol { get; set; } = "Cliente";
+        public string Rol { get; set; } = "Pendiente";
+        public string? RolAnterior { get; set; }
     }
 }

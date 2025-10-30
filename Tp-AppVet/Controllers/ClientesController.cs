@@ -1,17 +1,20 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Tp_AppVet.Data;
 using Tp_AppVet.Models;
 
 namespace Tp_AppVet.Controllers
 {
-    [Authorize(Roles = "Administrador")]
+    [Authorize(Roles = "Administrador,Pendiente")]
     public class ClientesController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -66,8 +69,30 @@ namespace Tp_AppVet.Controllers
             {
                 _context.Add(cliente);
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Cliente creado Exitosamente";
-                return RedirectToAction(nameof(Index));
+
+                var usuario = await _context.Usuarios
+                    .FirstOrDefaultAsync(u => u.Id == cliente.UsuarioId);
+
+                if(usuario != null)
+                {
+                    usuario.Rol = "Cliente";
+                    _context.Update(usuario);
+                    await _context.SaveChangesAsync();
+                    var claims = new List<Claim>
+                    {
+                        new Claim(ClaimTypes.Name, usuario.Email),
+                        new Claim(ClaimTypes.Email, usuario.Email),
+                        new Claim(ClaimTypes.Role, usuario.Rol)
+                    };
+
+                    var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+                    var principal = new ClaimsPrincipal(identity);
+                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+                }
+
+                TempData["SuccessMessage"] = $"Cliente creado Exitosamente: {usuario?.Email}";
+                return RedirectToAction("Index","ClienteDashboard");
             }
 
             ViewData["UsuarioId"] = new SelectList(_context.Usuarios, "Id", "Email", cliente.UsuarioId);
@@ -151,14 +176,37 @@ namespace Tp_AppVet.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var cliente = await _context.Clientes.FindAsync(id);
-            if (cliente != null)
+            var cliente = await _context.Clientes
+                .Include(c => c.Usuario)
+                .Include(c => c.Mascotas)
+                .Include(c => c.Turnos)
+                .FirstOrDefaultAsync(c => c.Id == id);
+            
+            if(cliente == null)
             {
-                _context.Clientes.Remove(cliente);
+                return NotFound();
+            }
+            
+            if ((cliente.Mascotas != null && cliente.Mascotas.Any()) 
+                || (cliente.Turnos != null && cliente.Turnos.Any()))
+            {
+                TempData["ErrorMessage"] = "No se puede eliminar este cliente porque tiene mascotas o turnos asignados.";
+                return RedirectToAction(nameof(Index));
             }
 
+            //Eliminar cliente
+            _context.Clientes.Remove(cliente);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+            //Eliminar Usuario asociado
+            if (cliente.Usuario != null)
+            {
+                _context.Usuarios.Remove(cliente.Usuario);
+                await _context.SaveChangesAsync();
+            }
+
+            TempData["SuccessMessage"] = "Cliente eliminado correctamente";
+            return RedirectToAction("Index", "ClienteDashboard");
         }
 
         private bool ClienteExists(int id)
