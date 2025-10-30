@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
+using System.Security.Claims;
 using Tp_AppVet.Data;
 using Tp_AppVet.Models;
 
@@ -92,16 +93,30 @@ namespace Tp_AppVet.Controllers
                 _context.Usuarios.Add(usuario);
                 _context.SaveChanges();
             }
+
+            // Crear claims incluyendo el rol
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, email),
+                new Claim(ClaimTypes.Email, email),
+                new Claim(ClaimTypes.Role, usuario.Rol)
+            };
+            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var principal = new ClaimsPrincipal(identity);
+
             // Autenticación local
             await HttpContext.SignInAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme,
-                authenticateResult.Principal);
+                principal);
 
             // Redirigir según rol
-            if (usuario.Rol == "Administrador")
-                return RedirectToAction("Dashboard", "Admin");
-            else
-                return RedirectToAction("Index", "Home");
+            return usuario.Rol switch
+            {
+                "Administrador" => RedirectToAction("Dashboard", "Admin"),
+                "Veterinario" => RedirectToAction("Index", "VeterinarioDashboard"),
+                "Cliente" => RedirectToAction("Index", "ClienteDashboard"),
+                _ => RedirectToAction("Index", "Home")
+            };
         }
     }
 }

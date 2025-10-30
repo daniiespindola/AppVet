@@ -25,6 +25,7 @@ builder.Services.AddAuthentication(options =>
         // Carga las claves desde la sección "Authentication:Google" en appsettings.json
         options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
         options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+        options.CallbackPath = "/signin-google";
     });
 
 builder.Services.AddAuthorization(); // Ya lo tenías.

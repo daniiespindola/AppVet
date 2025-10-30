@@ -11,24 +11,24 @@ using Tp_AppVet.Models;
 
 namespace Tp_AppVet.Controllers
 {
-    [Authorize(Roles = "Administrador")]
-    public class VeterinariosController : Controller
+    [Authorize(Roles = "Veterinario,Administrador")]
+    public class FichaMedicasController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public VeterinariosController(ApplicationDbContext context)
+        public FichaMedicasController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: Veterinarios
+        // GET: FichaMedicas
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Veterinarios.Include(v => v.Usuario);
+            var applicationDbContext = _context.FichaMedicas.Include(f => f.Mascota);
             return View(await applicationDbContext.ToListAsync());
         }
 
-        // GET: Veterinarios/Details/5
+        // GET: FichaMedicas/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -36,51 +36,42 @@ namespace Tp_AppVet.Controllers
                 return NotFound();
             }
 
-            var veterinario = await _context.Veterinarios
-                .Include(v => v.Usuario)
+            var fichaMedica = await _context.FichaMedicas
+                .Include(f => f.Mascota)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (veterinario == null)
+            if (fichaMedica == null)
             {
                 return NotFound();
             }
 
-            return View(veterinario);
+            return View(fichaMedica);
         }
 
-        // GET: Veterinarios/Create
+        // GET: FichaMedicas/Create
         public IActionResult Create()
         {
-            ViewData["UsuarioId"] = new SelectList(_context.Usuarios, "Id", "Email");
+            ViewData["MascotaId"] = new SelectList(_context.Mascotas, "Id", "Especie");
             return View();
         }
 
-        // POST: Veterinarios/Create
+        // POST: FichaMedicas/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nombre,Apellido,Matricula,Especialidad,UsuarioId")] Veterinario veterinario)
+        public async Task<IActionResult> Create([Bind("Id,FechaCreacion,Observaciones,MascotaId")] FichaMedica fichaMedica)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(veterinario);
+                _context.Add(fichaMedica);
                 await _context.SaveChangesAsync();
-
-                var usuario = await _context.Usuarios.FindAsync(veterinario.UsuarioId);
-                if(usuario != null)
-                {
-                    usuario.Rol = "Veterinario";
-                    _context.Update(usuario);
-                    await _context.SaveChangesAsync();
-                }
-                TempData["SuccessMessage"] = "Veterinario creado Exitosamente";
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["UsuarioId"] = new SelectList(_context.Usuarios, "Id", "Email", veterinario.UsuarioId);
-            return View(veterinario);
+            ViewData["MascotaId"] = new SelectList(_context.Mascotas, "Id", "Especie", fichaMedica.MascotaId);
+            return View(fichaMedica);
         }
 
-        // GET: Veterinarios/Edit/5
+        // GET: FichaMedicas/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -88,23 +79,23 @@ namespace Tp_AppVet.Controllers
                 return NotFound();
             }
 
-            var veterinario = await _context.Veterinarios.FindAsync(id);
-            if (veterinario == null)
+            var fichaMedica = await _context.FichaMedicas.FindAsync(id);
+            if (fichaMedica == null)
             {
                 return NotFound();
             }
-            ViewData["UsuarioId"] = new SelectList(_context.Usuarios, "Id", "Email", veterinario.UsuarioId);
-            return View(veterinario);
+            ViewData["MascotaId"] = new SelectList(_context.Mascotas, "Id", "Especie", fichaMedica.MascotaId);
+            return View(fichaMedica);
         }
 
-        // POST: Veterinarios/Edit/5
+        // POST: FichaMedicas/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nombre,Apellido,Matricula,Especialidad,UsuarioId")] Veterinario veterinario)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,FechaCreacion,Observaciones,MascotaId")] FichaMedica fichaMedica)
         {
-            if (id != veterinario.Id)
+            if (id != fichaMedica.Id)
             {
                 return NotFound();
             }
@@ -113,12 +104,12 @@ namespace Tp_AppVet.Controllers
             {
                 try
                 {
-                    _context.Update(veterinario);
+                    _context.Update(fichaMedica);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!VeterinarioExists(veterinario.Id))
+                    if (!FichaMedicaExists(fichaMedica.Id))
                     {
                         return NotFound();
                     }
@@ -129,11 +120,11 @@ namespace Tp_AppVet.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["UsuarioId"] = new SelectList(_context.Usuarios, "Id", "Email", veterinario.UsuarioId);
-            return View(veterinario);
+            ViewData["MascotaId"] = new SelectList(_context.Mascotas, "Id", "Especie", fichaMedica.MascotaId);
+            return View(fichaMedica);
         }
 
-        // GET: Veterinarios/Delete/5
+        // GET: FichaMedicas/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -141,35 +132,35 @@ namespace Tp_AppVet.Controllers
                 return NotFound();
             }
 
-            var veterinario = await _context.Veterinarios
-                .Include(v => v.Usuario)
+            var fichaMedica = await _context.FichaMedicas
+                .Include(f => f.Mascota)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (veterinario == null)
+            if (fichaMedica == null)
             {
                 return NotFound();
             }
 
-            return View(veterinario);
+            return View(fichaMedica);
         }
 
-        // POST: Veterinarios/Delete/5
+        // POST: FichaMedicas/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var veterinario = await _context.Veterinarios.FindAsync(id);
-            if (veterinario != null)
+            var fichaMedica = await _context.FichaMedicas.FindAsync(id);
+            if (fichaMedica != null)
             {
-                _context.Veterinarios.Remove(veterinario);
+                _context.FichaMedicas.Remove(fichaMedica);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool VeterinarioExists(int id)
+        private bool FichaMedicaExists(int id)
         {
-            return _context.Veterinarios.Any(e => e.Id == id);
+            return _context.FichaMedicas.Any(e => e.Id == id);
         }
     }
 }
