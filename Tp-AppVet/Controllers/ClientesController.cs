@@ -51,10 +51,18 @@ namespace Tp_AppVet.Controllers
         }
 
         // GET: Clientes/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            Console.WriteLine("Entró al POST de Create");
-            ViewData["UsuarioId"] = new SelectList(_context.Usuarios, "Id", "Email");
+            var email = User.FindFirstValue(ClaimTypes.Email);
+            var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.Email == email);
+
+            if(usuario == null)
+            {
+                TempData["ErrorMessage"] = "Usuario no encontrado";
+                return RedirectToAction("Idenx", "Home");
+            } 
+            
+            ViewData["UsuarioId"] = new SelectList(new List<Usuario> { usuario }, "Id", "Email",usuario.Id);
             return View();
         }
 
@@ -65,13 +73,27 @@ namespace Tp_AppVet.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Nombre,Apellido,Dni,Telefono,UsuarioId")] Cliente cliente)
         {
+            var email = User.FindFirstValue(ClaimTypes.Email);
+            var usuario = await _context.Usuarios
+                    .FirstOrDefaultAsync(u => u.Id == cliente.UsuarioId);
+
+            if(usuario == null)
+            {
+                TempData["ErrorMessage"] = "Usuario no encontrado.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            if(cliente.UsuarioId != usuario.Id)
+            {
+                ModelState.AddModelError("", "El correo seleccionado no corresponde al usuario actual.");
+                ViewData["UsuarioId"] = new SelectList(new List<Usuario> { usuario }, "Id", "Email", usuario.Id);
+                return View(cliente);
+            }
+
             if (ModelState.IsValid)
             {
                 _context.Add(cliente);
                 await _context.SaveChangesAsync();
-
-                var usuario = await _context.Usuarios
-                    .FirstOrDefaultAsync(u => u.Id == cliente.UsuarioId);
 
                 if(usuario != null)
                 {
@@ -86,7 +108,6 @@ namespace Tp_AppVet.Controllers
                     };
 
                     var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
                     var principal = new ClaimsPrincipal(identity);
                     await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
                 }
@@ -95,7 +116,7 @@ namespace Tp_AppVet.Controllers
                 return RedirectToAction("Index","ClienteDashboard");
             }
 
-            ViewData["UsuarioId"] = new SelectList(_context.Usuarios, "Id", "Email", cliente.UsuarioId);
+            ViewData["UsuarioId"] = new SelectList(new List<Usuario> {usuario}, "Id", "Email",usuario.Id);
             return View(cliente);
         }
 
@@ -184,7 +205,8 @@ namespace Tp_AppVet.Controllers
             
             if(cliente == null)
             {
-                return NotFound();
+                TempData["ErrorMessage"] = "El cliente no existe o ya fue eliminado.";
+                return RedirectToAction("Index","Clientes");
             }
             
             if ((cliente.Mascotas != null && cliente.Mascotas.Any()) 
@@ -193,20 +215,27 @@ namespace Tp_AppVet.Controllers
                 TempData["ErrorMessage"] = "No se puede eliminar este cliente porque tiene mascotas o turnos asignados.";
                 return RedirectToAction(nameof(Index));
             }
-
-            //Eliminar cliente
-            _context.Clientes.Remove(cliente);
-            await _context.SaveChangesAsync();
-
-            //Eliminar Usuario asociado
-            if (cliente.Usuario != null)
+            try
             {
-                _context.Usuarios.Remove(cliente.Usuario);
+                _context.Clientes.Remove(cliente);
                 await _context.SaveChangesAsync();
+                if (cliente.Usuario != null)
+                {
+                    _context.Usuarios.Remove(cliente.Usuario);
+                    await _context.SaveChangesAsync();
+                }
+                TempData["SuccessMessage"] = "Cliente eliminado correctamente.";
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                TempData["ErrorMessage"] = "Error de concurrencia: el cliente fue modificado o eliminado por otro proceso.";
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Ocurrió un error: {ex.Message}";
             }
 
-            TempData["SuccessMessage"] = "Cliente eliminado correctamente";
-            return RedirectToAction("Index", "ClienteDashboard");
+            return RedirectToAction("Index", "Clientes");
         }
 
         private bool ClienteExists(int id)

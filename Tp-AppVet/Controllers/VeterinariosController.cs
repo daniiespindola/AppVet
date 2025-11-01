@@ -51,9 +51,17 @@ namespace Tp_AppVet.Controllers
         }
 
         // GET: Veterinarios/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ViewData["UsuarioId"] = new SelectList(_context.Usuarios, "Id", "Email");
+            var email = User.FindFirstValue(ClaimTypes.Email);
+            var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.Email == email);
+
+            if (usuario == null)
+            {
+                TempData["ErrorMessage"] = "Usuario no encontrado.";
+                return RedirectToAction("Index", "Home");
+            }
+            ViewData["UsuarioId"] = new SelectList(new List<Usuario> { usuario }, "Id", "Email", usuario.Id);
             return View();
         }
 
@@ -64,13 +72,25 @@ namespace Tp_AppVet.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Nombre,Apellido,Matricula,Especialidad,UsuarioId")] Veterinario veterinario)
         {
+            var email = User.FindFirstValue(ClaimTypes.Email);
+            var usuario = await _context.Usuarios
+                    .FirstOrDefaultAsync(u => u.Id == veterinario.UsuarioId);
+            
+            if (usuario == null)
+            {
+                TempData["ErrorMessage"] = "Usuario no encontrado.";
+                return RedirectToAction("Index", "Home");
+            }
+            if (veterinario.UsuarioId != usuario.Id)
+            {
+                ModelState.AddModelError("", "El correo seleccionado no corresponde al usuario actual.");
+                ViewData["UsuarioId"] = new SelectList(new List<Usuario> { usuario }, "Id", "Email", usuario.Id);
+                return View(veterinario);
+            }
             if (ModelState.IsValid)
             {
                 _context.Add(veterinario);
                 await _context.SaveChangesAsync();
-
-                var usuario = await _context.Usuarios
-                    .FirstOrDefaultAsync(u => u.Id == veterinario.UsuarioId);
                     
                 if(usuario != null)
                 {
@@ -94,7 +114,7 @@ namespace Tp_AppVet.Controllers
                 TempData["SuccessMessage"] = $"Veterinario creado Exitosamente: {usuario?.Email}";
                 return RedirectToAction("Index", "VeterinarioDashboard");
             }
-            ViewData["UsuarioId"] = new SelectList(_context.Usuarios, "Id", "Email", veterinario.UsuarioId);
+            ViewData["UsuarioId"] = new SelectList(new List<Usuario> { usuario }, "Id", "Email", usuario.Id);
             return View(veterinario);
         }
 
@@ -204,7 +224,7 @@ namespace Tp_AppVet.Controllers
             } 
 
             TempData["SuccessMessage"] = "Veterinario eliminado correctamente";
-            return RedirectToAction("Index", "VeterinarioDashboard");
+            return RedirectToAction("Index", "Veterinarios");
         }
 
         private bool VeterinarioExists(int id)
