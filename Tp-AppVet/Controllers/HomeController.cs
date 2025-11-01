@@ -87,7 +87,7 @@ namespace Tp_AppVet.Controllers
             if (usuario == null)
             {
                 // Asignar rol Admin si es tu correo, Cliente para otros
-                string rol = (email == "rebecolque263@gmail.com") ? "Administrador" : "Pendiente";
+                string rol = (email == "TU_CORREO@gmail.com") ? "Administrador" : "Pendiente";
                 usuario = new Usuario { Email = email, Rol = rol };
                 _context.Usuarios.Add(usuario);
                 await _context.SaveChangesAsync();
