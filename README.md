@@ -16,16 +16,21 @@ Google OAuth 2.0 (inicio de sesión con cuenta de Google)
 
 # Descripción
 
-AppVet es una aplicación web que gestiona la información de una veterinaria.
-Permite registrar clientes, veterinarios y administradores, cada uno con diferentes permisos y vistas personalizadas (Dashboards).
+**AppVet** es una aplicación web que gestiona la información de una veterinaria.
+Permite registrar **clientes, veterinarios** y **administradores**, cada uno con diferentes permisos y vistas personalizadas (Dashboards).
 
-Roles:
+**Roles:**
 
-Administrador: acceso total, puede asignar o quitar roles.
+- **Administrador:** acceso total, puede asignar o quitar roles.
 
-Veterinario: CRUD de mascotas, fichas médicas y turnos.
+- **Veterinario:** CRUD de mascotas, fichas médicas y turnos.
 
-Cliente: solo lectura (visualiza su información y fichas).
+- **Cliente:** solo lectura (visualiza su información y fichas).
+
+⚠️ **Nota sobre el rol Administrador**
+El administrador puede **editar, ver detalles y eliminar** clientes y veterinarios, pero **no puede crearlos** directamente.  
+La creación de usuarios se realiza únicamente mediante **inicio de sesión con Google**, donde el usuario decide si registrarse como Cliente o Veterinario.
+
 
 # Inicio de Sesión con Google 🔑
 
@@ -33,7 +38,7 @@ El sistema usa autenticación con Google.
 
 Si el usuario no existe, se crea con rol "Pendiente".
 
-En HomeController, el correo del administrador puede modificarse:
+En **HomeController**, el correo del administrador puede modificarse:
 ```bash
 string rol = (email == "TU_CORREO@gmail.com") ? "Administrador" : "Pendiente";
 ```
@@ -43,7 +48,7 @@ string rol = (email == "TU_CORREO@gmail.com") ? "Administrador" : "Pendiente";
 
 Motor: SQL Server
 ORM: Entity Framework Core
-Cadena de conexión (appsettings.json):
+Cadena de conexión **(appsettings.json):**
 ```bash
 "ConnectionStrings": {
   "DefaultConnection": "Server=TU_SERVIDOR;Database=DbAppVet;Trusted_Connection=True;TrustServerCertificate=True;"
@@ -54,19 +59,19 @@ Cadena de conexión (appsettings.json):
 
 # Ejecución del Proyecto 🚀
 
-Clonar o abrir el proyecto en Visual Studio.
+- Clonar o abrir el proyecto en Visual Studio.
 
-Verificar la cadena de conexión en appsettings.json.
+- Verificar la cadena de conexión en appsettings.json.
 
-Crear la base de datos con los siguientes comandos en la Consola del Administrador de Paquetes:
+- Crear la base de datos con los siguientes comandos en la Consola del Administrador de Paquetes:
 ```bash
 Add-Migration InitialCreate
 Update-Database
 ```
 
-Ejecutar el proyecto con F5.
+- Ejecutar el proyecto con F5.
 
-Iniciar sesión con una cuenta de Google.
+- Iniciar sesión con una cuenta de Google.
 
 # Backup de la Base de Datos 💾
 
