@@ -1,4 +1,4 @@
-🐾 AppVet — Sistema de Gestión Veterinaria
+# AppVet — Sistema de Gestión Veterinaria 🐾
 👥 Integrantes
 
 - Daniel Espindola
@@ -14,7 +14,7 @@ SQL Server
 
 Google OAuth 2.0 (inicio de sesión con cuenta de Google)
 
-🧩 Descripción
+# Descripción
 
 AppVet es una aplicación web que gestiona la información de una veterinaria.
 Permite registrar clientes, veterinarios y administradores, cada uno con diferentes permisos y vistas personalizadas (Dashboards).
@@ -27,7 +27,7 @@ Veterinario: CRUD de mascotas, fichas médicas y turnos.
 
 Cliente: solo lectura (visualiza su información y fichas).
 
-🔑 Inicio de Sesión con Google
+# Inicio de Sesión con Google 🔑
 
 El sistema usa autenticación con Google.
 
@@ -39,7 +39,7 @@ string rol = (email == "TU_CORREO@gmail.com") ? "Administrador" : "Pendiente";
 ```
 👉 Cada integrante puede poner su propio correo para ser administrador.
 
-🗄️ Base de Datos
+# Base de Datos
 
 Motor: SQL Server
 ORM: Entity Framework Core
@@ -52,7 +52,7 @@ Cadena de conexión (appsettings.json):
 
 ⚠️ Cambiar TU_SERVIDOR por el nombre local de tu equipo.
 
-🚀 Ejecución del Proyecto
+# Ejecución del Proyecto 🚀
 
 Clonar o abrir el proyecto en Visual Studio.
 
@@ -68,7 +68,7 @@ Ejecutar el proyecto con F5.
 
 Iniciar sesión con una cuenta de Google.
 
-💾 Backup de la Base de Datos
+# Backup de la Base de Datos 💾
 
 Para hacer una copia de seguridad:
 
