@@ -1,15 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using Tp_AppVet.Data;
 using Tp_AppVet.Models;
 
 namespace Tp_AppVet.Controllers
 {
+    [Authorize(Roles = "Veterinario,Administrador")]
     public class FichaMedicasController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -46,8 +49,43 @@ namespace Tp_AppVet.Controllers
         }
 
         // GET: FichaMedicas/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create(int? mascotaId)
         {
+            var email = User.FindFirstValue(ClaimTypes.Email);
+            var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.Email == email);
+
+            if (usuario == null)
+            {
+                TempData["ErrorMessage"] = "Usuario no encontrado.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            // Solo veterinarios o administradores pueden crear fichas
+            if (usuario.Rol != "Veterinario" && usuario.Rol != "Administrador")
+            {
+                TempData["ErrorMessage"] = "No tenés permiso para crear fichas médicas.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            var hayMascotas = await _context.Mascotas.AnyAsync();
+            // Verificar que se haya pasado una mascota
+            if (!hayMascotas)
+            {
+                TempData["ErrorMessage"] = "Debés registrar una mascota antes de crear una Ficha Médica.";
+                return RedirectToAction("Index", "VeterinarioDashboard");
+            }
+
+            // Verificar que la mascota exista
+            if (mascotaId.HasValue)
+            {
+                var mascota = await _context.Mascotas.FindAsync(mascotaId);
+                if (mascota == null)
+                {
+                    TempData["ErrorMessage"] = "La mascota seleccionada no existe.";
+                    return RedirectToAction("Index", "VeterinarioDashboard");
+                }
+
+            }
             ViewData["MascotaId"] = new SelectList(_context.Mascotas, "Id", "Especie");
             return View();
         }

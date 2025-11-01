@@ -1,0 +1,25 @@
+﻿@{
+    ViewData["Title"] = "Elegir tipo de registro";
+}
+
+<div class="modal show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-center p-4">
+            <div class="modal-header border-0">
+                <h5 class="modal-title w-100">🐾 ¡Bienvenido!</h5>
+            </div>
+            <div class="modal-body">
+                <p>¿Cómo querés registrarte?</p>
+                <div class="d-flex justify-content-center gap-3 mt-3">
+                    <a href="@Url.Action("Create", "Clientes")" class="btn btn-primary px-4 py-2">
+                        Registrarme como Cliente
+                    </a>
+                    <a href="@Url.Action("Create", "Veterinarios")" class="btn btn-success px-4 py-2">
+                        Registrarme como Veterinario
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

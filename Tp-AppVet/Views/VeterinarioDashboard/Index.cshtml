@@ -1,0 +1,26 @@
+﻿@{
+    ViewData["Title"] = "Panel del Veterinario";
+}
+<div class="container mt-4">
+    <h2>🩺 Panel del Veterinario</h2>
+    <hr />
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger text-center mt-3">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <p>Desde aquí podés gestionar los turnos, mascotas y fichas médicas.</p>
+    <div class="mb-3">
+        <a class="btn btn-primary" asp-controller="Mascotas" asp-action="Index">Gestionar Mascotas</a>
+        <a class="btn btn-primary" asp-controller="Turnoes" asp-action="Index">Gestionar Turnos</a>
+        <a class="btn btn-primary" asp-controller="FichaMedicas" asp-action="Index">Gestionar Fichas Médicas</a>
+    </div>
+    @if (User.IsInRole("Administrador"))
+    {
+        <a asp-controller="Admin" asp-action="Dashboard" class="btn btn-secondary">
+            ← Volver al Dashboard Admin
+        </a>
+    }
+</div>

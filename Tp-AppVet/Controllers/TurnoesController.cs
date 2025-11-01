@@ -1,15 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using Tp_AppVet.Data;
 using Tp_AppVet.Models;
 
 namespace Tp_AppVet.Controllers
 {
+    [Authorize(Roles = "Veterinario,Administrador")]
     public class TurnoesController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -48,8 +51,40 @@ namespace Tp_AppVet.Controllers
         }
 
         // GET: Turnoes/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            var email = User.FindFirstValue(ClaimTypes.Email);
+            var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.Email == email);
+
+            if (usuario == null)
+            {
+                TempData["ErrorMessage"] = "Usuario no encontrado.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            // Solo veterinarios o administradores pueden crear turnos
+            if (usuario.Rol != "Veterinario" && usuario.Rol != "Administrador")
+            {
+                TempData["ErrorMessage"] = "No tenés permiso para crear turnos.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            // Validar que haya al menos un cliente
+            var hayClientes = await _context.Clientes.AnyAsync();
+            if (!hayClientes)
+            {
+                TempData["ErrorMessage"] = "Debés registrar un cliente antes de crear un turno.";
+                return RedirectToAction("Index", "VeterinarioDashboard");
+            }
+
+            // Validar que haya al menos una mascota
+            var hayMascotas = await _context.Mascotas.AnyAsync();
+            if (!hayMascotas)
+            {
+                TempData["ErrorMessage"] = "Necesitás registrar una mascota antes de crear un turno.";
+                return RedirectToAction("Index", "VeterinarioDashboard");
+            }
+
             ViewData["ClienteId"] = new SelectList(_context.Clientes, "Id", "Apellido");
             ViewData["MascotaId"] = new SelectList(_context.Mascotas, "Id", "Especie");
             ViewData["VeterinarioId"] = new SelectList(_context.Veterinarios, "Id", "Apellido");

@@ -16,7 +16,7 @@ namespace Tp_AppVet.Models
         public string Especialidad { get; set; }
         [Required]
         public int UsuarioId { get; set; }
-        public Usuario Usuario { get; set; }
-        public ICollection<Turno> Turnos { get; set; }
+        public Usuario? Usuario { get; set; }
+        public ICollection<Turno>? Turnos { get; set; }
     }
 }

@@ -4,12 +4,19 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Lista de Clientes</h1>
-
+<h1>Cliente Index</h1>
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
 <p>
-    <a asp-action="Create">Crear nuevo usuario</a>
+    <a asp-action="Create">Create New</a>
 </p>
-<table class="table datatable table-striped">
+<table class="table table-striped table-bordered datatable">
     <thead>
         <tr>
             <th>
@@ -49,42 +56,14 @@
                 @Html.DisplayFor(modelItem => item.Usuario.Email)
             </td>
             <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning me-1">Edit</a> 
-                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info me-1 text-white">Details</a> 
-
-                    <form id="deleteForm_@item.Id" asp-action="Borrar" asp-route-id="@item.Id" method="post" style="display:inline;">
-
-                        <button type="button"
-                                onclick="confirmarEliminacion(@item.Id)"
-                                class="btn btn-link p-0 text-danger">
-                            Delete
-                        </button>
-                    </form>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
             </td>
         </tr>
 }
     </tbody>
 </table>
-@section Scripts {
-    <script>
-        function confirmarEliminacion(id) {
-            // Dispara la alerta de confirmación
-            Swal.fire({
-                title: '¿Estás seguro?',
-                text: "¡No podrás revertir esta acción!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33', // Rojo para eliminar
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Sí, ¡Eliminar!',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => {
-                // Comprueba si el usuario hizo clic en "Sí, ¡Eliminar!"
-                if (result.isConfirmed) {
-                    // Envía el formulario POST con el ID correspondiente al Controller
-                    document.getElementById('deleteForm_' + id).submit();
-                }
-            });
-        }
-    </script>
-}
+<a asp-controller="Admin" asp-action="Dashboard" class="btn btn-secondary">
+    ← Volver al Dashboard
+</a>

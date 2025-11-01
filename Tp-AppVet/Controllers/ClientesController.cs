@@ -1,15 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using Tp_AppVet.Data;
 using Tp_AppVet.Models;
 
 namespace Tp_AppVet.Controllers
 {
+    [Authorize(Roles = "Administrador,Pendiente")]
     public class ClientesController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -46,26 +51,72 @@ namespace Tp_AppVet.Controllers
         }
 
         // GET: Clientes/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ViewData["UsuarioId"] = new SelectList(_context.Usuarios, "Id", "Email");
+            var email = User.FindFirstValue(ClaimTypes.Email);
+            var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.Email == email);
+
+            if(usuario == null)
+            {
+                TempData["ErrorMessage"] = "Usuario no encontrado";
+                return RedirectToAction("Idenx", "Home");
+            } 
+            
+            ViewData["UsuarioId"] = new SelectList(new List<Usuario> { usuario }, "Id", "Email",usuario.Id);
             return View();
         }
 
         // POST: Clientes/Create
-    
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Nombre,Apellido,Dni,Telefono,UsuarioId")] Cliente cliente)
         {
+            var email = User.FindFirstValue(ClaimTypes.Email);
+            var usuario = await _context.Usuarios
+                    .FirstOrDefaultAsync(u => u.Id == cliente.UsuarioId);
+
+            if(usuario == null)
+            {
+                TempData["ErrorMessage"] = "Usuario no encontrado.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            if(cliente.UsuarioId != usuario.Id)
+            {
+                ModelState.AddModelError("", "El correo seleccionado no corresponde al usuario actual.");
+                ViewData["UsuarioId"] = new SelectList(new List<Usuario> { usuario }, "Id", "Email", usuario.Id);
+                return View(cliente);
+            }
+
             if (ModelState.IsValid)
             {
                 _context.Add(cliente);
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "¡El cliente " + cliente.Nombre + " ha sido creado con éxito!";
-                return RedirectToAction(nameof(Index));
+
+                if(usuario != null)
+                {
+                    usuario.Rol = "Cliente";
+                    _context.Update(usuario);
+                    await _context.SaveChangesAsync();
+                    var claims = new List<Claim>
+                    {
+                        new Claim(ClaimTypes.Name, usuario.Email),
+                        new Claim(ClaimTypes.Email, usuario.Email),
+                        new Claim(ClaimTypes.Role, usuario.Rol)
+                    };
+
+                    var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                    var principal = new ClaimsPrincipal(identity);
+                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+                }
+
+                TempData["SuccessMessage"] = $"Cliente creado Exitosamente: {usuario?.Email}";
+                return RedirectToAction("Index","ClienteDashboard");
             }
-            ViewData["UsuarioId"] = new SelectList(_context.Usuarios, "Id", "Email", cliente.UsuarioId);
+
+            ViewData["UsuarioId"] = new SelectList(new List<Usuario> {usuario}, "Id", "Email",usuario.Id);
             return View(cliente);
         }
 
@@ -87,7 +138,8 @@ namespace Tp_AppVet.Controllers
         }
 
         // POST: Clientes/Edit/5
-      
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Nombre,Apellido,Dni,Telefono,UsuarioId")] Cliente cliente)
@@ -145,24 +197,45 @@ namespace Tp_AppVet.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            // 1. PRIMERO: Encontrar el cliente
-            var cliente = await _context.Clientes.FindAsync(id);
-
-            if (cliente != null)
+            var cliente = await _context.Clientes
+                .Include(c => c.Usuario)
+                .Include(c => c.Mascotas)
+                .Include(c => c.Turnos)
+                .FirstOrDefaultAsync(c => c.Id == id);
+            
+            if(cliente == null)
             {
-                // 2. SEGUNDO: Obtener el nombre ANTES de la eliminación
-                string nombreCliente = cliente.Nombre;
-
-                // 3. TERCERO: Eliminar y guardar cambios
+                TempData["ErrorMessage"] = "El cliente no existe o ya fue eliminado.";
+                return RedirectToAction("Index","Clientes");
+            }
+            
+            if ((cliente.Mascotas != null && cliente.Mascotas.Any()) 
+                || (cliente.Turnos != null && cliente.Turnos.Any()))
+            {
+                TempData["ErrorMessage"] = "No se puede eliminar este cliente porque tiene mascotas o turnos asignados.";
+                return RedirectToAction(nameof(Index));
+            }
+            try
+            {
                 _context.Clientes.Remove(cliente);
                 await _context.SaveChangesAsync();
-
-                // 4. CUARTO: Configurar TempData con el nombre correcto
-                TempData["SuccessMessage"] = $"¡El cliente {nombreCliente} ha sido eliminado con éxito!";
+                if (cliente.Usuario != null)
+                {
+                    _context.Usuarios.Remove(cliente.Usuario);
+                    await _context.SaveChangesAsync();
+                }
+                TempData["SuccessMessage"] = "Cliente eliminado correctamente.";
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                TempData["ErrorMessage"] = "Error de concurrencia: el cliente fue modificado o eliminado por otro proceso.";
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Ocurrió un error: {ex.Message}";
             }
 
-            // Si el cliente era nulo, simplemente redirige sin mensaje de éxito
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Index", "Clientes");
         }
 
         private bool ClienteExists(int id)
