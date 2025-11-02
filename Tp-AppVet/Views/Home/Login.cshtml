@@ -1,8 +1,40 @@
-﻿<h1>Iniciar Sesión</h1>
-<p>Por favor, usa tu cuenta de Google para iniciar sesión.</p>
+﻿@{
+    // Debe ser la primera línea del archivo, sin nada antes.
+    ViewData["Title"] = "Iniciar Sesión";
+}
 
-<form asp-controller="Home" asp-action="IniciarSesionGoogle" method="post">
-    <button type="submit" class="btn btn-primary">
-        Iniciar sesión con Google
-    </button>
-</form>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow-lg border-3 border-info" style="border-radius: 1.5rem;">
+
+                <div class="card-header text-center text-white bg-vet-primary p-4" style="border-radius: 1.2rem 1.2rem 0 0;">
+                    <i class="bi bi-person-lock display-4 mb-2"></i>
+                    <h1 class="h3 fw-bold mb-0">¡Acceso de Mascotas VIP!</h1>
+                </div>
+
+                <div class="card-body p-5 text-center">
+
+                    <h2 class="mb-4 text-primary">Iniciar Sesión</h2>
+
+                    <p class="text-muted mb-4">
+                        Por favor, usa tu cuenta de Google para iniciar sesión.
+                    </p>
+
+                    <div class="d-grid gap-2">
+                        <form asp-controller="Home" asp-action="IniciarSesionGoogle" method="post">
+                            <button type="submit" class="btn btn-primary btn-lg shadow">
+                                <i class="bi bi-google me-2"></i> Iniciar sesión con Google
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-top">
+                        <i class="bi bi-heart-fill text-danger me-1"></i> ¡Estamos listos para atenderte!
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
